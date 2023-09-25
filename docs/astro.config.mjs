@@ -20,6 +20,7 @@ const { openAPISidebarGroups, starlightOpenAPI } = await generateAPI([
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://openpayments.guide',
   integrations: [
     // overrideIntegration(),
     react(),
@@ -52,15 +53,9 @@ export default defineConfig({
             directory: 'guides'
           }
         },
-        {
-          label: 'API references',
-          autogenerate: {
-            directory: 'api_references'
-          }
-        },
         // Add the generated sidebar groups to the sidebar.
         {
-          label: 'API specifications',
+          label: 'API references',
           items: openAPISidebarGroups
         }
       ]
