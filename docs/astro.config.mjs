@@ -40,8 +40,11 @@ export default defineConfig({
           items: [
             { label: 'Overview', link: '/introduction/overview/' },
             { label: 'Authorization', link: '/introduction/authorization/' },
-            { label: 'Wallet addresses', link: '/introduction/wallet-addresses/' },
-            { label: 'Open Payments flow', link: '/introduction/op-flow/' },
+            {
+              label: 'Wallet addresses',
+              link: '/introduction/wallet-addresses/'
+            },
+            { label: 'Open Payments flow', link: '/introduction/op-flow/' }
           ]
         },
         {
