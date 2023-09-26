@@ -25,7 +25,7 @@ export default defineConfig({
     // overrideIntegration(),
     react(),
     starlight({
-      title: 'OpenPayments',
+      title: 'Open Payments',
       customCss: [
         './node_modules/@interledger/docs-design-system/src/styles/green-theme.css',
         './node_modules/@interledger/docs-design-system/src/styles/ilf-docs.css',
@@ -37,15 +37,12 @@ export default defineConfig({
       sidebar: [
         {
           label: 'Intro to Open Payments',
-          autogenerate: {
-            directory: 'introduction'
-          }
-        },
-        {
-          label: 'Security',
-          autogenerate: {
-            directory: 'security'
-          }
+          items: [
+            { label: 'Overview', link: '/introduction/overview/' },
+            { label: 'Authorization', link: '/introduction/authorization/' },
+            { label: 'Wallet addresses', link: '/introduction/wallet-addresses/' },
+            { label: 'Open Payments flow', link: '/introduction/op-flow/' },
+          ]
         },
         {
           label: 'Guides',

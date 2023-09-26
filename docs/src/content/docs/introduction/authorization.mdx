@@ -1,0 +1,53 @@
+---
+title: Authorization
+---
+
+<mark> TO DO </mark>
+
+## GNAP
+
+Existing content mostly covered in overview; expand on GNAP on this page
+
+## Request Authentication
+[Client keys and request signatures]
+
+<hr />
+
+#### Existing content starts here 
+
+Security of client requests follows a profile of the mechanisms defined in the GNAP specification.
+
+Open Payments does not support bearer tokens and only supports a sub-set of key formats and methods for proving key possession.
+
+All client requests in Open Payments are signed using a key that identifies the client to the authorization server or resource server. All requests to the RS, and most requests to the AS, also carry an access token that is bound to the key used to sign the request. The exception is requests to the AS to initiate a new grant request, these will have no access token initially, but any continuation request MUST use the access token provided by the AS.
+Clients
+
+Clients are identified by the keys they use to sign requests. When making an initial grant request a client must identify itself in the body of the request.
+
+All subsequent requests signed using the same key will be bound to that client.
+
+Clients identify themselves using a URL that points to a client resource. This resource provides details such as the client's display name, website, logo etc. The public keys bound to the client are also shared at a relative URL (./jwks.json) and can be fetched by servers to ensure that a client identifier is correctly bound to the key used in a request.
+Request Digests
+
+The integrity of all request bodies is protected by generating a digest that is included in the data signed by the request signature.
+
+All requests that have a body MUST also have a Content-Digest header as described in the Digest Fields specification.
+Request Signatures
+
+The integrity of all requests is protected by a signature, generated according to the HTTP Signatures specification
+
+#### Existing content stops here 
+
+<hr />
+
+## Requesting Access Grants 
+
+[Initiating a GNAP interaction with the AS]
+
+this page is blank in readme
+
+<hr />
+
+#### etc
+
+in orig doc but not in current overview: The authorization of access to Open Payments-enabled accounts can be separated from the ASE if the ASE desires. The authorization services can even be fulfilled by multiple federated providers if required by a future use case.

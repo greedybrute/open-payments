@@ -1,6 +1,54 @@
 ---
 title: Overview
-description: A guide in my new Starlight docs site.
 ---
 
-Open Payments is an HTTP-based API that can be implemented by any digital wallet to enable clients to interface with the wallet. It uses a profile of the Grant Negotiation and Agreement Protocol to define a mechanism by which clients get authorization to use the APIs and get data about the wallet owner.
+Open Payments is an open API standard for implementation by account servicing entities (ASEs). ASEs provide and maintain payment accounts for payers and payees, and are regulated entities within the countries they operate. Examples of ASEs include banks, digital wallet providers, and mobile money providers.
+
+When an ASE implements Open Payments (OP), their customers' financial accounts become OP-enabled. Clients, such as third-party applications, can then call the Open Payments APIs to view an OP-enabled account’s transaction history and certain account details, initiate payments from the account, and receive payments into the account.
+
+For example, an application developer can build payments functionality into their app such that a user with an OP-enabled account can use the app to send funds to another OP-enabled account regardless of whether the recipient uses the same app. Apps should be able to connect to any ASE that implements the Open Payments standard without the need for custom integrations.
+
+## Payments
+
+Open Payments does not execute payments or touch funds in any way. Instead, its APIs allow clients to issue payment instructions to ASEs. 
+
+For example, a client can instruct an ASE to send a payment of $20.00 USD from its mutual customer’s account to another OP-enabled account at a different ASE. The sending ASE is responsible for executing and settling the payment with the receiving ASE outside of Open Payments. The ability to execute payments between OP-enabled ASEs is predicated on the availability of a common payment rail between the ASEs. 
+
+By separating payment instructions from execution/settlement, clients can include payment functionality within their feature sets without, for example, also registering as a licensed money transfer business. 
+
+<p><mark>Link to secondary page, if applicable</mark></p>
+
+## Authorization
+
+Part of issuing payment instructions includes requesting and obtaining authorization. The correct levels of authorization must be granted to clients and ASEs for a set of payment instructions to be acted upon. Open Payments leverages the Grant Negotiation and Authorization Protocol (GNAP) to define a standard mechanism by which clients get authorization (via access tokens) to use the Open Payments APIs and retrieve data about an account holder.
+
+Grants give clients the authorization to perform one or more operations. GNAP makes it possible to give account holders specific and fine-grained control over the permissions they grant to the clients that connect to their accounts, including control over the amounts of transactions with time-based and velocity-based limits. This enables powerful use cases such as third-party payment initiation and delegated authorization without compromising the security of the underlying financial accounts and payment instruments.
+
+<p><mark>Link to secondary page, if applicable</mark></p>
+
+## Roles
+
+GNAP clearly separates the roles of authorization server and resource server.
+
+Access tokens are requested from the **authorization server**. The APIs implemented by the authorization server are a profile of GNAP and are defined in our documentation. 
+
+Access is granted to the **resource server**, where operations are performed. In Open Payments, the ASE is the resource server and the OP-enabled account is the primary resource. APIs implemented by the resource server are defined by the Open Payments API specification. An open-source implementation of an Open Payments resource server, called Rafiki, is currently in development.
+
+The entity accessing either server is the client. An example of a client is a third-party application. 
+
+<p><mark>Link to secondary page, if applicable</mark></p>
+
+## Open Payments account identification
+
+Every OP-enabled account is identified by one or more URLs. These URLs not only identify the account, but are also OP service endpoints that provide the entry point for the APIs. These URLs are called [wallet addresses](/introduction/wallet-addresses) within the context of Open Payments.
+
+## Open Banking
+
+Open Payments attempts to improve upon existing Open Banking standards as defined in the UK, EU, and other jurisdictions. 
+
+Existing Open Banking ecosystems are dominated by aggregators and intermediaries, making it impossible for independent third-parties, such as small merchants, to use payment initiation APIs directly against their customers’ payment accounts. 
+
+The goal of Open Payments is to define a standard that is adopted by all ASEs, creating an application layer for the Internet of Value, allowing applications to integrate payments directly into their products without requiring users to create new accounts for every application.
+
+Open Payments allows for scenarios where clients can dynamically register and engage with the APIs without needing to pre-register with an ASE, resulting in a truly distributed and federated payment ecosystem with global reach and no dependencies on any particular underlying payment account type or settlement system. Open Payments is also a significantly less complicated standard with a small number of resource types and a simpler, yet more powerful, authorization protocol.
+
