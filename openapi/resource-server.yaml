@@ -28,7 +28,7 @@ info:
   contact:
     email: tech@interledger.org
 servers:
-  - url: '/rafiki.money'
+  - url: 'https://rafiki.money'
     description: 'Server for wallet address subresources (ie https://openpayments.guide/alice)'
 tags:
   - name: wallet-address
