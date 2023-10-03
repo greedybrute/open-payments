@@ -7,7 +7,6 @@ At the heart of all interactions in Open Payments (OP) is an OP-enabled account.
 A URL is only a wallet address if the:
 
 - Server handling the HTTP requests to the URL supports the OP protocol
-- URL dereferences a resource defined by the OP APIs, where resource equals client, OP-enabled account, incoming payment, or outgoing payment
 - URL uses the `https` protocol and has no `user-info`, `port`, `query string`, or `fragment` parts
 
 The quickest way to test if a URL is a wallet address is to make an HTTP `GET` request to the URL with an `Accept` header value of `application/json`.

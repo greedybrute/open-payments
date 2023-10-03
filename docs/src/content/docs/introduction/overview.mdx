@@ -4,9 +4,9 @@ title: Overview
 
 Open Payments is an open API standard for implementation by account servicing entities (ASEs). ASEs provide and maintain payment accounts for payers and payees, and are regulated entities within the countries they operate. Examples of ASEs include banks, digital wallet providers, and mobile money providers.
 
-When an ASE implements Open Payments (OP), their customers' financial accounts become OP-enabled. Clients, such as third-party applications, can then call the Open Payments APIs to view an OP-enabled account’s transaction history and certain account details, initiate payments from the account, and receive payments into the account.
+When an ASE implements Open Payments (OP), their customers' financial accounts become OP-enabled. Clients, such as third-party applications, can then call the Open Payments APIs to view an OP-enabled account’s transaction history and certain account details, as well as issue payment instructions to receive payments into and send payments from the account.
 
-For example, an application developer can build payments functionality into their app such that a user with an OP-enabled account can use the app to send funds to another OP-enabled account regardless of whether the recipient uses the same app. Apps should be able to connect to any ASE that implements the Open Payments standard without the need for custom integrations.
+For example, an application developer can build payments functionality into their app such that a user with an OP-enabled account can use the app to send funds to another OP-enabled account regardless of whether the recipient uses the same app. The app should be able to connect to any ASE that implements the Open Payments standard without the need for custom integrations.
 
 ## Payments
 
@@ -20,39 +20,29 @@ By separating payment instructions from execution/settlement, clients can includ
   <mark>Link to secondary page, if applicable</mark>
 </p>
 
-## Authorization
-
-Part of issuing payment instructions includes requesting and obtaining authorization. The correct levels of authorization must be granted to clients and ASEs for a set of payment instructions to be acted upon. Open Payments leverages the Grant Negotiation and Authorization Protocol (GNAP) to define a standard mechanism by which clients get authorization (via access tokens) to use the Open Payments APIs and retrieve data about an account holder.
-
-Grants give clients the authorization to perform one or more operations. GNAP makes it possible to give account holders specific and fine-grained control over the permissions they grant to the clients that connect to their accounts, including control over the amounts of transactions with time-based and velocity-based limits. This enables powerful use cases such as third-party payment initiation and delegated authorization without compromising the security of the underlying financial accounts and payment instruments.
-
-<p>
-  <mark>Link to secondary page, if applicable</mark>
-</p>
-
-## Roles
-
-GNAP clearly separates the roles of authorization server and resource server.
-
-Access tokens are requested from the **authorization server**. The APIs implemented by the authorization server are a profile of GNAP and are defined in our documentation.
-
-Access is granted to the **resource server**, where operations are performed. In Open Payments, the ASE is the resource server and the OP-enabled account is the primary resource. APIs implemented by the resource server are defined by the Open Payments API specification. An open-source implementation of an Open Payments resource server, called Rafiki, is currently in development.
-
-The entity accessing either server is the client. An example of a client is a third-party application.
-
-<p>
-  <mark>Link to secondary page, if applicable</mark>
-</p>
-
 ## Open Payments account identification
 
 Every OP-enabled account is identified by one or more URLs. These URLs not only identify the account, but are also OP service endpoints that provide the entry point for the APIs. These URLs are called [wallet addresses](/introduction/wallet-addresses) within the context of Open Payments.
+
+## Grant Negotiation and Authorization
+
+Clients must receive grants before issuing payment instructions. Grants give clients the authorization, via access tokens, to perform one or more operations. Access tokens represent the rights that are granted to the client, such as the right to create an incoming payment request.
+
+Open Payments leverages the Grant Negotiation and Authorization Protocol (GNAP) to define a standard mechanism for clients to request and receive grants that allow the clients to use the Open Payments APIs.
+
+GNAP makes it possible to give account holders specific and fine-grained control over the permissions they grant to the clients that connect to their accounts, including control over the amounts of transactions with time-based and velocity-based limits. This enables powerful use cases such as third-party payment initiation and delegated authorization without compromising the security of the underlying financial accounts and payment instruments.
+
+<p>
+  <mark>Link to secondary page, if applicable</mark>
+</p>
 
 ## Open Banking
 
 Open Payments attempts to improve upon existing Open Banking standards as defined in the UK, EU, and other jurisdictions.
 
 Existing Open Banking ecosystems are dominated by aggregators and intermediaries, making it impossible for independent third-parties, such as small merchants, to use payment initiation APIs directly against their customers’ payment accounts.
+
+## Goals
 
 The goal of Open Payments is to define a standard that is adopted by all ASEs, creating an application layer for the Internet of Value, allowing applications to integrate payments directly into their products without requiring users to create new accounts for every application.
 

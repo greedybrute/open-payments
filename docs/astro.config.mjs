@@ -39,12 +39,17 @@ export default defineConfig({
           label: 'Intro to Open Payments',
           items: [
             { label: 'Overview', link: '/introduction/overview/' },
-            { label: 'Authorization', link: '/introduction/authorization/' },
             {
               label: 'Wallet addresses',
               link: '/introduction/wallet-addresses/'
             },
-            { label: 'Open Payments flow', link: '/introduction/op-flow/' }
+            { label: 'Authorization', link: '/introduction/authorization/' },
+            {
+              label: 'Grant negotiation and authorization',
+              link: '/introduction/grants/'
+            },
+            { label: 'Open Payments flow', link: '/introduction/op-flow/' },
+            { label: 'Glossary', link: '/introduction/glossary/' }
           ]
         },
         {
