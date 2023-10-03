@@ -8,53 +8,56 @@ Overview text goes here
 
 ## Prerequisites
 
-<Disclosure toggleText='Sign up for a Rafiki.money account' client:load>
-  test
-</Disclosure>
+Before you begin, make sure you have the following:
 
-<Disclosure
-  toggleText='Get a payment pointer and a public-private key pair'
-  client:load
->
-  test
-</Disclosure>
+- An installed package manager, such as npm, pnpm, or yarn.
+- An Interledger testnet account. Sign up for an account at [Rafiki.money](https://rafiki.money).
+- A USD payment account on testnet funded with at least $11.
+- A payment pointer for the USD payment account.
+- The [Open Payments code snippet package](https://github.com/interledger/open-payments-snippets).
 
-<Disclosure toggleText='Install the Open Payments snippets package' client:load>
-  test
+## Set up
+
+<Disclosure toggleText='Get a public and private key' client:load>
+  1. Access testnet. 2. Go to Settings > Developer Keys. 3. Expand the drop-down
+  menu for your account. 4. Click *Generate public & private key*. The private
+  key will automatically download to your machine as a `.key` file. The private
+  key will also appear in a dialogue within Testnet. Close the dialogue. 5. Move
+  the downloaded `private.key` file into the root directory of your snippets
+  repository.
 </Disclosure>
 
 <Disclosure toggleText='Set up your .env file' client:load>
-  test
+Set up your `.env` file to  initialize an authenticated Open Payments client.
+
+1. Ensure you are at the root of the code snippet repository, then run:
+   ```shellscript
+   cp .env.example .env
+   ```
+2. Open the newly created `.env` file.
+3. Fill in the following variables in the `# Client` section, then save the file.
+
+- KEY_ID - Copy this value from testnet
+- PAYMENT_POINTER - Copy this value from testnet, replacing the `$` with `https://` (e.g., `$ilp.rafiki.money/alice` will be `https://ilp.rafiki.money/alice`).
+
+You are now ready to start working with the Open Payments snippets.
+
 </Disclosure>
 
-## Write the code
+## Request a grant for an incoming payment
 
-Add the following to `filename.js`.
+Ensure you are still at the repository root.
 
-Replace the following variables in the Write the Code snippet.
+In your terminal window, run:
 
-| Thing 1 | Thing 2 |
-| ------- | ------- |
-| Stuff 1 | Stuff 2 |
-
-```
-Code
+```shellscript
+pnpm grant:ip
 ```
 
-[View full source](http://google.com)
+where `pnpm` is your preferred package manager.
 
-## Run the code
+Copy the resulting `INCOMING_PAYMENT_ACCESS_TOKEN` value and fill in the corresponding variable in your `.env` file.
 
-Save this file to your machine and run it.
+Save the file.
 
-```
-Code
-```
-
-## Try it out
-
-E.g., When you run the code the TO_NUMBER will be called and a text-to-speech message will be heard if the call is answered.
-
-## Further reading
-
-- [First thing](http://google.com) - Description
+EXAMPLE OUTPUT
