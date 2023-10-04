@@ -39,21 +39,31 @@ export default defineConfig({
           label: 'Intro to Open Payments',
           items: [
             { label: 'Overview', link: '/introduction/overview/' },
+            { label: 'Open Payments flow', link: '/introduction/op-flow/' },
             {
               label: 'Wallet addresses',
               link: '/introduction/wallet-addresses/'
             },
-            { label: 'Authorization', link: '/introduction/authorization/' },
+            { label: 'Glossary', link: '/introduction/glossary/' },
             {
-              label: 'Grant negotiation and authorization',
-              link: '/introduction/grants/'
-            },
-            { label: 'Open Payments flow', link: '/introduction/op-flow/' },
-            { label: 'Glossary', link: '/introduction/glossary/' }
+              label: 'Security',
+              collapsed: true,
+              items: [
+                {
+                  label: 'Grant negotiation and authorization',
+                  link: '/introduction/grants/'
+                },
+                {
+                  label: 'Authentication',
+                  link: '/introduction/authentication/'
+                }
+              ]
+            }
           ]
         },
         {
           label: 'Guides',
+          collapsed: true,
           items: [
             {
               label: 'Generate HTTP signatures',
@@ -76,6 +86,7 @@ export default defineConfig({
         // Add the generated sidebar groups to the sidebar.
         {
           label: 'API reference',
+          collapsed: true,
           items: openAPISidebarGroups
         }
       ]

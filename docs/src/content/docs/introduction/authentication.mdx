@@ -1,0 +1,99 @@
+---
+title: Authentication of requests
+---
+
+Security of client requests follows a profile of the mechanism defined in the [GNAP specification](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol#name-securing-requests-from-the-) except that Open Payments does not support bearer tokens.
+
+## Client keys
+
+All client requests in Open Payments are signed using a unique key that identifies the client to the authorization and resource servers. All requests, except for new grant requests, also carry an access token that is bound to the key.
+
+When sending a new grant request to the authorization server, the client must identify itself by including its wallet address in the `client` parameter of the request and by signing the request with its unique key. All subsequent requests signed using the same key will be bound to that client.
+
+Key material must be available within a JSON Web Key Set (JWKS) document located at the wallet address + `/jwks.json` URL. For example, `https://wallet.example.com/alice/jwks.json`. The document must include the public key (`kid`) the client will use to protect:
+
+- the request
+- any continuation requests at the authorization server
+- any user-facing information about the client used in interactions
+
+```http
+{
+  "keys": [
+    {
+      "kid": "3724c845-829d-425a-9a0d-194d6f12c336",
+      "x": "_Eg6UcC8G-O4TY2cxGnZyG_lMn0aWF1rVV-Bqn9NmhE",
+      "alg": "EdDSA",
+      "kty": "OKP",
+      "crv": "Ed25519"
+    }
+  ]
+}
+```
+
+Servers can fetch the document to ensure the client identifier is correctly bound to the key used in a request.
+
+---
+
+## Proving possession of a key
+
+Any keys presented by the client to the authorization and resource servers must be validated as part of the request in which they are presented.
+
+The `proof` parameter of the `key` object indicates the type of binding used.
+
+Key proof methods are specified either by a string, which consists of the key proof method name on its own, or by a JSON object with the required field method:
+
+method:
+
+    The name of the key proofing method to be used. REQUIRED.
+
+Individual methods defined as objects MAY define additional parameters as members in this object.
+Values for the method defined by this specification are as follows:
+
+"httpsig" (string or object):
+
+    HTTP Signing signature headers. See Section 7.3.1.
+
+---
+
+### Request signatures
+
+The integrity of all HTTP requests is protected by a signature, generated according to the [HTTP Signatures specification](https://datatracker.ietf.org/doc/draft-ietf-httpbis-message-signatures/).
+
+---
+
+Open Payments API uses GNAP for authorization. An access token must be acquired from an authorization server before accessing the API and then provided in the request headers using the prefix GNAP.
+
+All requests must also be signed using a client key over some select headers and a digest of the request body.
+
+Signature-Input (json required) - The Signature-Input field is a Dictionary structured field containing the metadata for one or more message signatures generated from components within the HTTP message. Each member describes a single message signature. The member's key is the label that uniquely identifies the message signature within the context of the HTTP message. The member's value is the serialization of the covered components Inner List plus all signature metadata parameters identified by the label. The following components MUST be included:
+
+- @method
+- @target
+- uri
+- authorization
+
+When the message contains a request body, the covered components must also include the following:
+
+- content-digest
+
+The keyid parameter of the signature must be set to the kid value of the JWK. See ietf-httpbis-message-signatures for more details
+
+Signature (json required) - The signature generated based on the Signature-Input, using the signing algorithm specified in the alg field of the JWK.
+
+---
+
+### Request digests
+
+It’s important that request bodies do not become corrupted. The integrity of all request bodies is protected by generating a digest that’s included in the data signed by the request signature.
+
+All requests that have a body must have a `Content-Digest` header as described in the [Digest Fields specification](https://datatracker.ietf.org/doc/draft-ietf-httpbis-digest-headers/). `Content-Digest` is an HTTP field for communicating digests that are calculated using a hashing algorithm applied to the actual message content.
+
+For example:
+
+```http
+Content-Digest: \
+    sha-512=:YMAam51Jz/jOATT6/zvHrLVgOYTGFy1d6GJiOHTohq4yP+pgk4vf2aCs\
+    yRZOtw8MjkM7iw7yZ/WkppmM44T3qg==:
+```
+
+Receivers can then validate the digest for integrity purposes.

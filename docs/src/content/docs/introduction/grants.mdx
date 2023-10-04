@@ -2,10 +2,10 @@
 title: Grant negotiation and authorization
 ---
 
-<mark>To do (maybe not all on the same page)</mark>* How do you run your own AS
-* How does the key registry work with the AS * How does the AS talk to the RS *
-What are the introspection points between the RS and AS * What is an identity
-server * How does that work with the AS
+<mark>To do (maybe not all on the same page)</mark>* How do you run your own AS *
+How does the key registry work with the AS * How does the AS talk to the RS * What
+are the introspection points between the RS and AS * What is an identity server *
+How does that work with the AS * Initiating a GNAP interaction with the AS?
 
 <hr />
 
@@ -15,15 +15,17 @@ Before a client can issue payment instructions for incoming payments, quotes, or
 
 ## Grants
 
-GNAP allows a client instance to request delegated authorization to resource servers and subject information (e.g., transaction history). The delegation is facilitated by an authorization server. The process by which the delegation happens is known as a grant.
+GNAP allows a client instance to request delegated authorization to protected resources from a party other than the end user. This delegation is facilitated by an authorization server, which exposes APIs compliant with the GNAP standard. The process by which the delegation occurs is known as a grant.
 
-Grants are issued by authorization servers. An authorization server is uniquely identified by its grant endpoint URI, which is an absolute URI where grant requests are started by clients. Successful grant requests result in clients receiving one or more access tokens from the authorization server.
+### Grant requests
 
-Access tokens:
+In Open Payments, the client must <mark>[request a grant]()</mark> before calling the Open Payments API to create an <mark>[incoming payment]()</mark>, <mark>[outgoing payment]()</mark>, and/or <mark>[quote]()</mark>. A client can request a single grant for each one, but not for multiples of each. For example, a client can request a single grant for an incoming and outgoing payment, but not for two incoming payments.
 
-- represent the rights that are granted to the client
-- act as credentials when calling the Open Payments APIs
-- allow the client to access protected resources on a resource server and perform operations on these resources
+The authorization server is uniquely identified by its grant endpoint URI, which is an absolute URI where clients start grant requests. A successfully issued grant results in the client receiving an access token. The access token:
+
+- represents the rights granted to the client
+- acts as credentials when calling a resource server's Open Payments API
+- allows the client to access protected resources on the resource server and perform operations on these resources
 
 In Open Payments, the ASE is the resource server and the OP-enabled account is the primary resource. An open-source implementation of an Open Payments resource server, called [Rafiki](https://rafiki.dev), is currently in development.
 
@@ -31,62 +33,6 @@ In Open Payments, the ASE is the resource server and the OP-enabled account is t
 The authorization of access to an OP-enabled account can be separated from the ASE if desired. The authorization service can even be fulfilled by multiple federated providers if a use case requires this in the future.
 :::
 
-A client must <mark>[request a grant]()</mark> before calling the Open Payments APIs to create an incoming payment, outgoing payment, or quote. Each one requires its own access token; however, the client can ask for multiple access tokens in a single grant request.
+### Grant continuation and cancellation
 
 The client can issue a <mark>[grant continuation request]()</mark> if a grant needs to be modified or continued. For example, a client may initially need read access to a resource, but later require write access. The client can request to <mark>[cancel a grant]()</mark> if it no longer needs access to protected resources on the resource server. Clients can also <mark>[rotate]()</mark> and <mark>[revoke]()</mark> access tokens.
-
-## Client requests
-
-### Securing requests from the client instance
-
-Security of client requests follows a profile of the mechanisms defined in the [GNAP specification](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol#name-securing-requests-from-the-).
-
-The client secures all of its requests to both the authorization server and the resource server by presenting a signed key that identifies the client to the server. Most client requests also carry an access token that is bound to the key used to sign the request. Only client requests to the authorization server to initiate a new grant request will not carry an access token.
-
-### Client keys
-
-All client requests in Open Payments are signed using a key that identifies the client to the authorization server or resource server. In GNAP, the client secures its requests by presenting proof that it possesses the key. While GNAP supports bearer tokens, Open Payments does not. Open Payments only supports a subset of key formats and methods for proving key possession.
-
-When sending a grant initiation request, the client must sign the request and identify itself in the body via the client parameter. The client is the wallet address of the client making the request. All subsequent requests signed using the same key will be bound to the client.
-
-A JSON Web Key Set (JWKS) document must be available at the wallet address + jwks.json. For example, `https://wallet.example.com/alice/jwks.json`. The document must include the `kid` (Key ID), which is the public key that the client will use to protect:
-
-- the request
-- any continuation requests at the authorization server
-- any user-facing information about the client used in interactions
-
-Servers can fetch the document to ensure the client identifier is correctly bound to the key used in a request.
-
-```http
-{
-  "keys": [
-    {
-      "kid": "3724c845-829d-425a-9a0d-194d6f12c336",
-      "x": "_Eg6UcC8G-O4TY2cxGnZyG_lMn0aWF1rVV-Bqn9NmhE",
-      "alg": "EdDSA",
-      "kty": "OKP",
-      "crv": "Ed25519"
-    }
-  ]
-}
-```
-
-### Request signatures
-
-The integrity of all HTTP requests is protected by a signature, generated according to the [HTTP Signatures specification](https://datatracker.ietf.org/doc/draft-ietf-httpbis-message-signatures/).
-
-### Request digests
-
-It’s important that request bodies do not become corrupted. The integrity of all request bodies is protected by generating a digest that’s included in the data signed by the request signature.
-
-All requests that have a body must have a `Content-Digest` header as described in the [Digest Fields specification](https://datatracker.ietf.org/doc/draft-ietf-httpbis-digest-headers/). `Content-Digest` is an HTTP field for communicating digests that are calculated using a hashing algorithm applied to the actual message content.
-
-For example:
-
-```http
-Content-Digest: \
-    sha-512=:YMAam51Jz/jOATT6/zvHrLVgOYTGFy1d6GJiOHTohq4yP+pgk4vf2aCs\
-    yRZOtw8MjkM7iw7yZ/WkppmM44T3qg==:
-```
-
-Receivers can then validate the digest for integrity purposes.
