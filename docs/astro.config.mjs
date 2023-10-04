@@ -54,13 +54,28 @@ export default defineConfig({
         },
         {
           label: 'Guides',
-          autogenerate: {
-            directory: 'guides'
-          }
+          items: [
+            {
+              label: 'Generate HTTP signatures',
+              link: '/guides/generate-http-signatures'
+            },
+            {
+              label: 'Create a grant request',
+              link: '/guides/create-grant-request'
+            },
+            {
+              label: 'Continue an interaction',
+              link: '/guides/continue-interaction'
+            },
+            {
+              label: 'Make a payment using TypeScript',
+              link: '/guides/make-payment-ts'
+            }
+          ]
         },
         // Add the generated sidebar groups to the sidebar.
         {
-          label: 'API references',
+          label: 'API reference',
           items: openAPISidebarGroups
         }
       ]
