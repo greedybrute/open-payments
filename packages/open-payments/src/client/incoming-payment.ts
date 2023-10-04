@@ -1,10 +1,5 @@
 import { HttpMethod, ResponseValidator } from '@interledger/openapi'
-import {
-  BaseDeps,
-  CollectionRequestArgs,
-  ResourceRequestArgs,
-  RouteDeps
-} from '.'
+import { BaseDeps, ResourceOrCollectionRequestArgs, RouteDeps } from '.'
 import {
   IncomingPayment,
   getRSPath,
@@ -18,14 +13,16 @@ import { get, post } from './requests'
 type AnyIncomingPayment = IncomingPayment | IncomingPaymentWithPaymentMethods
 
 export interface IncomingPaymentRoutes {
-  get(args: ResourceRequestArgs): Promise<IncomingPaymentWithPaymentMethods>
+  get(
+    args: ResourceOrCollectionRequestArgs
+  ): Promise<IncomingPaymentWithPaymentMethods>
   create(
-    args: CollectionRequestArgs,
+    args: ResourceOrCollectionRequestArgs,
     createArgs: CreateIncomingPaymentArgs
   ): Promise<IncomingPaymentWithPaymentMethods>
-  complete(args: ResourceRequestArgs): Promise<IncomingPayment>
+  complete(args: ResourceOrCollectionRequestArgs): Promise<IncomingPayment>
   list(
-    args: CollectionRequestArgs,
+    args: ResourceOrCollectionRequestArgs,
     pagination?: PaginationArgs
   ): Promise<IncomingPaymentPaginationResult>
 }
@@ -60,14 +57,14 @@ export const createIncomingPaymentRoutes = (
     })
 
   return {
-    get: (args: ResourceRequestArgs) =>
+    get: (args: ResourceOrCollectionRequestArgs) =>
       getIncomingPayment(
         { axiosInstance, logger },
         args,
         getIncomingPaymentOpenApiValidator
       ),
     create: (
-      requestArgs: CollectionRequestArgs,
+      requestArgs: ResourceOrCollectionRequestArgs,
       createArgs: CreateIncomingPaymentArgs
     ) =>
       createIncomingPayment(
@@ -76,13 +73,16 @@ export const createIncomingPaymentRoutes = (
         createIncomingPaymentOpenApiValidator,
         createArgs
       ),
-    complete: (args: ResourceRequestArgs) =>
+    complete: (args: ResourceOrCollectionRequestArgs) =>
       completeIncomingPayment(
         { axiosInstance, logger },
         args,
         completeIncomingPaymentOpenApiValidator
       ),
-    list: (args: CollectionRequestArgs, pagination?: PaginationArgs) =>
+    list: (
+      args: ResourceOrCollectionRequestArgs,
+      pagination?: PaginationArgs
+    ) =>
       listIncomingPayment(
         { axiosInstance, logger },
         args,
@@ -94,15 +94,20 @@ export const createIncomingPaymentRoutes = (
 
 export const getIncomingPayment = async (
   deps: BaseDeps,
-  args: ResourceRequestArgs,
+  args: ResourceOrCollectionRequestArgs,
   validateOpenApiResponse: ResponseValidator<IncomingPaymentWithPaymentMethods>
 ) => {
   const { axiosInstance, logger } = deps
-  const { url } = args
+  const { url, walletAddress } = args
 
   const incomingPayment = await get(
     { axiosInstance, logger },
-    args,
+    {
+      ...args,
+      queryParams: {
+        'wallet-address': walletAddress
+      }
+    },
     validateOpenApiResponse
   )
 
@@ -121,13 +126,13 @@ export const getIncomingPayment = async (
 
 export const createIncomingPayment = async (
   deps: BaseDeps,
-  requestArgs: CollectionRequestArgs,
+  requestArgs: ResourceOrCollectionRequestArgs,
   validateOpenApiResponse: ResponseValidator<IncomingPaymentWithPaymentMethods>,
   createArgs: CreateIncomingPaymentArgs
 ) => {
   const { axiosInstance, logger } = deps
-  const { walletAddress, accessToken } = requestArgs
-  const url = `${walletAddress}${getRSPath('/incoming-payments')}`
+  const { url: baseUrl, accessToken } = requestArgs
+  const url = `${baseUrl}${getRSPath('/incoming-payments')}`
 
   const incomingPayment = await post(
     { axiosInstance, logger },
@@ -150,16 +155,16 @@ export const createIncomingPayment = async (
 
 export const completeIncomingPayment = async (
   deps: BaseDeps,
-  args: ResourceRequestArgs,
+  args: ResourceOrCollectionRequestArgs,
   validateOpenApiResponse: ResponseValidator<IncomingPayment>
 ) => {
   const { axiosInstance, logger } = deps
-  const { url: incomingPaymentUrl, accessToken } = args
+  const { url: incomingPaymentUrl, accessToken, walletAddress } = args
   const url = `${incomingPaymentUrl}/complete`
 
   const incomingPayment = await post(
     { axiosInstance, logger },
-    { url, accessToken },
+    { url, accessToken, body: { walletAddress } },
     validateOpenApiResponse
   )
 
@@ -178,21 +183,23 @@ export const completeIncomingPayment = async (
 
 export const listIncomingPayment = async (
   deps: BaseDeps,
-  args: CollectionRequestArgs,
+  args: ResourceOrCollectionRequestArgs,
   validateOpenApiResponse: ResponseValidator<IncomingPaymentPaginationResult>,
   pagination?: PaginationArgs
 ) => {
   const { axiosInstance, logger } = deps
-  const { accessToken, walletAddress } = args
+  const { url: baseUrl, accessToken, walletAddress } = args
 
-  const url = `${walletAddress}${getRSPath('/incoming-payments')}`
+  const url = `${baseUrl}${getRSPath('/incoming-payments')}`
 
   const incomingPayments = await get(
     { axiosInstance, logger },
     {
       url,
       accessToken,
-      ...(pagination ? { queryParams: { ...pagination } } : {})
+      ...(pagination
+        ? { queryParams: { ...pagination, 'wallet-address': walletAddress } }
+        : { queryParams: { 'wallet-address': walletAddress } })
     },
     validateOpenApiResponse
   )
