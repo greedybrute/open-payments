@@ -1,0 +1,25 @@
+---
+title: Make a payment
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+import { Disclosure } from '@interledger/docs-design-system'
+
+<mark>
+  We'll only have TypeScript at first, so there's no reason to have tabs, but
+  when we have more languages, we'll use tabs. Example below.
+</mark>
+
+## One-time payment
+
+<Tabs>
+  <TabItem label='TypeScript'>
+    lorem `ipsum`
+    <Disclosure toggleText='Install the Open Payments package' client:load>
+      Stuff
+    </Disclosure>
+  </TabItem>
+  <TabItem label='Other Lang'>lorem ipsum</TabItem>
+</Tabs>
+
+## Recurring payment

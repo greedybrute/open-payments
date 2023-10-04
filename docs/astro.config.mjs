@@ -68,7 +68,7 @@ export default defineConfig({
               link: '/guides/continue-interaction'
             },
             {
-              label: 'Make a payment using TypeScript',
+              label: 'Make a payment',
               link: '/guides/make-payment-ts'
             }
           ]
