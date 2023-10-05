@@ -26,6 +26,8 @@ export default defineConfig({
     react(),
     starlight({
       title: 'Open Payments',
+      description:
+        'An API for open access to financial accounts to send and receive payments.',
       customCss: [
         './node_modules/@interledger/docs-design-system/src/styles/green-theme.css',
         './node_modules/@interledger/docs-design-system/src/styles/ilf-docs.css',
@@ -79,7 +81,7 @@ export default defineConfig({
             },
             {
               label: 'Make a payment',
-              link: '/guides/make-payment-ts'
+              link: '/guides/make-payment'
             }
           ]
         },
