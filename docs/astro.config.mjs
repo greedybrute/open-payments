@@ -46,17 +46,85 @@ export default defineConfig({
               label: 'Wallet addresses',
               link: '/introduction/wallet-addresses/'
             },
-            { label: 'Glossary', link: '/introduction/glossary/' },
             {
-              label: 'Security',
+              label: 'Grant negotiation and authorization',
+              link: '/introduction/grants/'
+            },
+            {
+              label: 'HTTP message signatures',
+              link: '/introduction/http-signatures/'
+            },
+            {
+              label: 'Authentication',
+              link: '/introduction/authentication/'
+            },
+            { label: 'Glossary', link: '/introduction/glossary/' }
+          ]
+        },
+        {
+          label: 'Code snippets',
+          collapsed: true,
+          items: [
+            {
+              label: 'Getting started',
+              link: '/snippets/overview/'
+            },
+            {
+              label: 'Grants',
               collapsed: true,
               items: [
                 {
-                  label: 'Grant negotiation and authorization',
-                  link: '/introduction/grants/'
-                },
+                  label: 'Request a grant for an incoming payment',
+                  link: '/snippets/grant-incoming'
+                }
+              ]
+            },
+            {
+              label: 'Incoming payments',
+              collapsed: true,
+              items: [
                 {
-                  label: 'Authentication',
+                  label: 'Create an incoming payment',
+                  link: '/introduction/authentication/'
+                }
+              ]
+            },
+            {
+              label: 'Quotes',
+              collapsed: true,
+              items: [
+                {
+                  label: 'Create a quote',
+                  link: '/introduction/authentication/'
+                }
+              ]
+            },
+            {
+              label: 'Outgoing payments',
+              collapsed: true,
+              items: [
+                {
+                  label: 'Create an outgoing payment',
+                  link: '/introduction/authentication/'
+                }
+              ]
+            },
+            {
+              label: 'Payment pointers',
+              collapsed: true,
+              items: [
+                {
+                  label: 'Get a payment pointer info',
+                  link: ''
+                }
+              ]
+            },
+            {
+              label: 'Tokens',
+              collapsed: true,
+              items: [
+                {
+                  label: 'Rotate a token',
                   link: '/introduction/authentication/'
                 }
               ]
@@ -68,26 +136,32 @@ export default defineConfig({
           collapsed: true,
           items: [
             {
-              label: 'Generate HTTP signatures',
-              link: '/guides/generate-http-signatures'
-            },
-            {
               label: 'Create a grant request',
-              link: '/guides/create-grant-request'
+              link: '/guides/create-grant-request/'
             },
             {
               label: 'Continue an interaction',
-              link: '/guides/continue-interaction'
+              link: '/guides/continue-interaction/'
             },
             {
               label: 'Make a payment',
-              link: '/guides/make-payment'
+              link: '/guides/make-payment/'
+            },
+            {
+              label: 'Use cases',
+              collapsed: true,
+              items: [
+                {
+                  label: 'Send a tip',
+                  link: '/introduction/authentication/'
+                }
+              ]
             }
           ]
         },
         // Add the generated sidebar groups to the sidebar.
         {
-          label: 'API reference',
+          label: 'API specification',
           collapsed: true,
           items: openAPISidebarGroups
         }

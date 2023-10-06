@@ -1,22 +1,55 @@
 ---
-title: Authentication of requests
+title: Authentication of client requests
 ---
 
-Security of client requests follows a profile of the mechanism defined in the [GNAP specification](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol#name-securing-requests-from-the-) except that Open Payments does not support bearer tokens.
+import { CodeBlock } from '@interledger/docs-design-system'
+
+Security of client requests follows a profile of the mechanism defined in the [GNAP specification](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol#name-securing-requests-from-the-). Note that Open Payments **does not** support bearer tokens.
 
 ## Client keys
 
 All client requests in Open Payments are signed using a unique key that identifies the client to the authorization and resource servers. All requests, except for new grant requests, also carry an access token that is bound to the key.
 
-When sending a new grant request to the authorization server, the client must identify itself by including its wallet address in the `client` parameter of the request and by signing the request with its unique key. All subsequent requests signed using the same key will be bound to that client.
+### Key registry
 
-Key material must be available within a JSON Web Key Set (JWKS) document located at the wallet address + `/jwks.json` URL. For example, `https://wallet.example.com/alice/jwks.json`. The document must include the public key (`kid`) the client will use to protect:
+A key registry is a list of keys stored by a client that requires access to Open Payments resources protected by an authorization server. A key is [generated](#key-structure) and added to the registry by the client. The client is represented by a wallet address and the wallet address' associated key registry is exposed publicly at the path `WALLET_ADDRESS/jwks.json`. For example, `https://wallet.example.com/alice/jwks.json`.
+
+The key registry allows a server to verify that a client is who they say they are.
+
+### Acquisition of a client's key registry
+
+Because a grant request is completed over multiple signed HTTP requests, it's important for a client to provide a way to consistently identify itself across these requests.
+
+The client generates an asymmetric key pair which includes a key ID identifying the pair. When the client makes a grant request to the authorization server, the client must include a signature in the header that's signed by the private key and a `signature-input` header that includes the key ID of the public key associated with the private key used to sign the signature. <mark> more about sig below, link </mark>
+
+When the authorization server receives a signed grant request, the server makes a `GET` request to the client's `jwks.json` endpoint to acquire the key registry. The domain of the client is acquired by the authorization server during this initial grant request, after which the server binds the domain to the grant and uses it to acquire the key registry for subsequent grant requests.
+
+After the authorization server acquires the client's key registry, the server searches for the public key with a key ID that matches the one included in the `signature-input` header. Once the server finds the public key, the key will be used to decrypt and verify the signature, allowing the server to proceed with the grant request.
+
+### Key structure
+
+The key registry should expose public keys in the form of a JWK. Keys should be generated using the `ed25519` algorithm, and the resultant JWK should have fields with the following values:
+
+```
+{
+  alg: 'EdDSA',
+  kty: 'OKP',
+  crv: 'Ed25519'
+}
+```
+
+Additionally, the JWK should have the public key `kid` field to identify it in a signature. The client will use the `kid` to protect:
 
 - the request
 - any continuation requests at the authorization server
 - any user-facing information about the client used in interactions
 
-```http
+Public keys should contain the `x` field.
+
+The key material must be available within a JSON Web Key Set (JWKS) document located at `WALLET_ADDRESS/jwks.json`.
+
+<CodeBlock title="Example: https://wallet.example.com/alice/jwks.json">
+```json
 {
   "keys": [
     {
@@ -29,71 +62,35 @@ Key material must be available within a JSON Web Key Set (JWKS) document located
   ]
 }
 ```
+</CodeBlock>
 
-Servers can fetch the document to ensure the client identifier is correctly bound to the key used in a request.
+### Key proofing method
 
----
+Open Payments uses the [HTTP message signatures](https://datatracker.ietf.org/doc/html/draft-ietf-gnap-core-protocol#name-http-message-signatures) key proofing method. Clients typically secure their requests to the authorization and resource servers by presenting an access token and proof of a key it possesses. The exception is for calls to the authorization server to initiate a grant. In this case, a key proof is used with no access token and is a non-authorized signed request.
 
-## Proving possession of a key
+The `httpsig` proofing method must be declared as part of the key material when requesting a grant.
 
-Any keys presented by the client to the authorization and resource servers must be validated as part of the request in which they are presented.
-
-The `proof` parameter of the `key` object indicates the type of binding used.
-
-Key proof methods are specified either by a string, which consists of the key proof method name on its own, or by a JSON object with the required field method:
-
-method:
-
-    The name of the key proofing method to be used. REQUIRED.
-
-Individual methods defined as objects MAY define additional parameters as members in this object.
-Values for the method defined by this specification are as follows:
-
-"httpsig" (string or object):
-
-    HTTP Signing signature headers. See Section 7.3.1.
-
----
-
-### Request signatures
-
-The integrity of all HTTP requests is protected by a signature, generated according to the [HTTP Signatures specification](https://datatracker.ietf.org/doc/draft-ietf-httpbis-message-signatures/).
-
----
-
-Open Payments API uses GNAP for authorization. An access token must be acquired from an authorization server before accessing the API and then provided in the request headers using the prefix GNAP.
-
-All requests must also be signed using a client key over some select headers and a digest of the request body.
-
-Signature-Input (json required) - The Signature-Input field is a Dictionary structured field containing the metadata for one or more message signatures generated from components within the HTTP message. Each member describes a single message signature. The member's key is the label that uniquely identifies the message signature within the context of the HTTP message. The member's value is the serialization of the covered components Inner List plus all signature metadata parameters identified by the label. The following components MUST be included:
-
-- @method
-- @target
-- uri
-- authorization
-
-When the message contains a request body, the covered components must also include the following:
-
-- content-digest
-
-The keyid parameter of the signature must be set to the kid value of the JWK. See ietf-httpbis-message-signatures for more details
-
-Signature (json required) - The signature generated based on the Signature-Input, using the signing algorithm specified in the alg field of the JWK.
-
----
-
-### Request digests
-
-It’s important that request bodies do not become corrupted. The integrity of all request bodies is protected by generating a digest that’s included in the data signed by the request signature.
-
-All requests that have a body must have a `Content-Digest` header as described in the [Digest Fields specification](https://datatracker.ietf.org/doc/draft-ietf-httpbis-digest-headers/). `Content-Digest` is an HTTP field for communicating digests that are calculated using a hashing algorithm applied to the actual message content.
-
-For example:
-
-```http
-Content-Digest: \
-    sha-512=:YMAam51Jz/jOATT6/zvHrLVgOYTGFy1d6GJiOHTohq4yP+pgk4vf2aCs\
-    yRZOtw8MjkM7iw7yZ/WkppmM44T3qg==:
+```json
+"key": {
+    "proof": "httpsig",
+    "jwk": {
+        "kid": "3724c845-829d-425a-9a0d-194d6f12c336",
+        "x": "_Eg6UcC8G-O4TY2cxGnZyG_lMn0aWF1rVV-Bqn9NmhE",
+        "alg": "EdDSA",
+        "kty": "OKP",
+        "crv": "Ed25519"
+    }
+}
 ```
 
-Receivers can then validate the digest for integrity purposes.
+When using `httpsig`, the signer creates an HTTP Message Signature as described in the [HTTP Message Signatures specification](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-17)
+
+## Signatures
+
+Client request signatures are generated according to the [HTTP Message Signatures specification](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-16).
+
+<mark>In progress</mark>
+
+In general, a request secured with the httpsig method contains two headers, the Signature and the Signature-Input. The Signature is data signed by the algorithm specified in the JWK, and the signature input is a comma-separated list of headers that map to values in the data that was signed. These values should match the values provided in the headers of a signed GNAP request.
+
+The client's private key is used to sign the payload described in the httpsig signature method.

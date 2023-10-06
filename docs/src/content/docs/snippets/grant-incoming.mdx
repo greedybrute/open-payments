@@ -1,0 +1,95 @@
+---
+title: Request a grant for an incoming payment
+---
+
+import { Disclosure } from '@interledger/docs-design-system'
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+
+This code snippet does X, Y, and Z.
+
+<mark> Repetitive chunks should be made as MDX partials (transclusion)</mark>
+
+## Prerequisites
+
+<Disclosure toggleText='Get set up on Rafiki.money testnet' client:load>
+  Lorem ipsum blah blah blah
+</Disclosure>
+<Disclosure toggleText='Clone the Open Payments snippets repo' client:load>
+  1. Open Terminal. 2. Change the current working directory to the location
+  where you want the cloned directory. 3. Type `git clone` 4. Paste the
+  following URL, then press Enter. ```http
+  https://github.com/interledger/open-payments-snippets ```
+</Disclosure>
+
+## Request an incoming payment grant
+
+<Tabs>
+<TabItem label="TypeScript">
+Do the thing with some other things.
+
+Run the snippet from your local repository's root using your preferred package manager.
+
+`grant:ip`
+
+Eg `pnpm grant:ip`
+
+Test to see how typescript appears:
+```typescript
+import dotenv from "dotenv";
+import { join } from "path";
+import { createAuthenticatedClient, isPendingGrant } from "@interledger/open-payments";
+import { loadPrivateKey } from "utils/load-private-key";
+
+dotenv.config({ path: join(\_\_dirname, "..", ".env") });
+
+const KEY_ID = process.env.KEY_ID;
+const PAYMENT_POINTER = process.env.PAYMENT_POINTER;
+
+async function run() {
+const client = await createAuthenticatedClient({
+paymentPointerUrl: PAYMENT_POINTER,
+privateKey: loadPrivateKey(),
+keyId: KEY_ID,
+});
+
+    const paymentPointer = await client.paymentPointer.get({
+        url: PAYMENT_POINTER,
+    });
+
+    const grant = await client.grant.request(
+        {
+            url: paymentPointer.authServer,
+        },
+        {
+            access_token: {
+                access: [
+                    {
+                        type: "incoming-payment",
+                        actions: ["list", "list-all", "read", "read-all", "complete", "create"],
+                    },
+                ],
+            },
+        },
+    );
+
+    if (isPendingGrant(grant)) {
+        throw new Error("Expected non-interactive grant");
+    }
+
+    console.log("INCOMING_PAYMENT_ACCESS_TOKEN =", grant.access_token.value);
+    console.log("INCOMING_PAYMENT_ACCESS_TOKEN_MANAGE_URL = ", grant.access_token.manage);
+
+}
+
+run();
+```
+The end.
+
+</TabItem>
+<TabItem label="Go">
+asdasdsadsa
+</TabItem>
+<TabItem label="Something else">
+asdasdsadsa
+</TabItem>
+</Tabs>

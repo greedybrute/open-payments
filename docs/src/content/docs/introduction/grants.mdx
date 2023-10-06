@@ -2,11 +2,14 @@
 title: Grant negotiation and authorization
 ---
 
-<mark>To do (maybe not all on the same page)</mark>* How do you run your own AS
-* How does the key registry work with the AS * How does the AS talk to the RS *
-What are the introspection points between the RS and AS * What is an identity
-server * How does that work with the AS * Initiating a GNAP interaction with the
-AS?
+<mark>To do (maybe not all on the same page)</mark>
+
+- How do you run your own AS
+- How does the AS talk to the RS
+- What are the introspection points between the RS and AS
+- What is an identity server
+- How does that work with the AS
+- Initiating a GNAP interaction with the AS?
 
 <hr />
 
@@ -20,7 +23,7 @@ GNAP allows a client instance to request delegated authorization to protected re
 
 ### Grant requests
 
-In Open Payments, the client must <mark>[request a grant]()</mark> before calling the Open Payments API to create an <mark>[incoming payment]()</mark>, <mark>[outgoing payment]()</mark>, and/or <mark>[quote]()</mark>. A client can request a single grant for each one, but not for multiples of each. For example, a client can request a single grant for an incoming and outgoing payment, but not for two incoming payments.
+In Open Payments, the client must [request a grant](/apis/auth-server/operations/post-request) before calling the Open Payments API to create an [incoming payment](/apis/resource-server/operations/create-incoming-payment), [outgoing payment](/apis/resource-server/operations/create-outgoing-payment), and/or [quote](/apis/resource-server/operations/create-quote). A client can request a single grant for each one, but not for multiples of each. For example, a client can request a single grant for an incoming and outgoing payment, but not for two incoming payments.
 
 The authorization server is uniquely identified by its grant endpoint URI, which is an absolute URI where clients start grant requests. A successfully issued grant results in the client receiving an access token. The access token:
 
@@ -36,4 +39,4 @@ The authorization of access to an OP-enabled account can be separated from the A
 
 ### Grant continuation and cancellation
 
-The client can issue a <mark>[grant continuation request]()</mark> if a grant needs to be modified or continued. For example, a client may initially need read access to a resource, but later require write access. The client can request to <mark>[cancel a grant]()</mark> if it no longer needs access to protected resources on the resource server. Clients can also <mark>[rotate]()</mark> and <mark>[revoke]()</mark> access tokens.
+The client can issue a [grant continuation request](/apis/auth-server/operations/post-continue) if a grant needs to be modified or continued. For example, a client may initially need read access to a resource, but later require write access. The client can request to [cancel a grant](/apis/auth-server/operations/delete-continue) if it no longer needs access to protected resources on the resource server. Clients can also [rotate](/apis/auth-server/operations/post-token) and [revoke](/apis/auth-server/operations/delete-token) access tokens.
